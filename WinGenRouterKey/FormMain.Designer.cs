@@ -38,6 +38,7 @@
             this.labelMax = new System.Windows.Forms.Label();
             this.labelLength = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.buttonCopyToClipboard = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonGen
@@ -46,7 +47,7 @@
             this.buttonGen.Name = "buttonGen";
             this.buttonGen.Size = new System.Drawing.Size(260, 23);
             this.buttonGen.TabIndex = 0;
-            this.buttonGen.Text = "Generate Key";
+            this.buttonGen.Text = "&Generate Key";
             this.buttonGen.UseVisualStyleBackColor = true;
             this.buttonGen.Click += new System.EventHandler(this.buttonGen_Click);
             // 
@@ -61,11 +62,11 @@
             // buttonClose
             // 
             this.buttonClose.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonClose.Location = new System.Drawing.Point(12, 67);
+            this.buttonClose.Location = new System.Drawing.Point(12, 96);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(260, 23);
             this.buttonClose.TabIndex = 2;
-            this.buttonClose.Text = "&Close";
+            this.buttonClose.Text = "Cl&ose";
             this.buttonClose.UseVisualStyleBackColor = true;
             this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
             // 
@@ -120,18 +121,29 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(28, 99);
+            this.label1.Location = new System.Drawing.Point(9, 148);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(539, 13);
+            this.label1.Size = new System.Drawing.Size(65, 13);
             this.label1.TabIndex = 9;
-            this.label1.Text = "(For Netgear AC750, user pass max length is 32 chars, wifi pass max length is 64," +
-    " min char is 33, max char is 126)";
+            this.label1.Text = "place holder";
+            // 
+            // buttonCopyToClipboard
+            // 
+            this.buttonCopyToClipboard.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.buttonCopyToClipboard.Location = new System.Drawing.Point(12, 67);
+            this.buttonCopyToClipboard.Name = "buttonCopyToClipboard";
+            this.buttonCopyToClipboard.Size = new System.Drawing.Size(260, 23);
+            this.buttonCopyToClipboard.TabIndex = 10;
+            this.buttonCopyToClipboard.Text = "&Copy to clipboard";
+            this.buttonCopyToClipboard.UseVisualStyleBackColor = true;
+            this.buttonCopyToClipboard.Click += new System.EventHandler(this.buttonCopyToClipboard_Click);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(612, 121);
+            this.ClientSize = new System.Drawing.Size(612, 183);
+            this.Controls.Add(this.buttonCopyToClipboard);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.labelLength);
             this.Controls.Add(this.labelMax);
@@ -145,7 +157,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "FormMain";
-            this.Text = "Router Key Generator 1.0";
+            this.Text = "Router Key Generator 1.1";
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -164,6 +176,7 @@
         private System.Windows.Forms.Label labelMax;
         private System.Windows.Forms.Label labelLength;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button buttonCopyToClipboard;
     }
 }
 

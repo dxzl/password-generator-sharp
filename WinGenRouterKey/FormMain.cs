@@ -13,7 +13,7 @@ namespace WinGenRouterKey
     {
         const int DEF_MINCHAR = 33; // '!' (32, space char does not work on all routers)
         const int DEF_MAXCHAR = 126;
-        const int DEF_LENGTH = 64; // Netgear user pass max is 32, wifi pass is 64
+        const int DEF_LENGTH = 32; // Netgear user pass max is 32, wifi pass is 64 but wifi camera max is 32 unicode chars...
 
         int Min, Max, Length;
 
@@ -61,9 +61,16 @@ namespace WinGenRouterKey
             for (int ii = 0; ii < Length; ii++)
                 sKey += (Char)r.Next(Min, Max);
 
-            //TextDataFormat
-            Clipboard.SetText(sKey);
-            textBoxKey.Text = Clipboard.GetText();
+            textBoxKey.Text = sKey;
+        }
+
+        private void buttonCopyToClipboard_Click(object sender, EventArgs e)
+        {
+            if (textBoxKey.Text.Length > 0)
+            {
+                try { Clipboard.SetText(textBoxKey.Text); }
+                catch { MessageBox.Show("Unable to copy key to your Windows clipboard... please try again."); }
+            }
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -75,6 +82,8 @@ namespace WinGenRouterKey
             textBoxMin.Text = Min.ToString();
             textBoxMax.Text = Max.ToString();
             textBoxLength.Text = Length.ToString();
+            label1.Text = "(For Netgear AC750, user pass max length is 32 chars, wifi pass max length is 64, min char is 33, max char is 126.\n" +
+                "I would suggest 32 chars max wifi password length as some wifi cameras have 32 max unicode characters.)";
         }
 
         private void buttonClose_Click(object sender, EventArgs e)
