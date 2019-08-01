@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32; // used for registry access...
@@ -164,7 +166,7 @@ namespace WinGenRouterKey
                     {
                         if (v.Min <= v.Max + 1)
                         {
-                            Char c = (Char)r.Next(v.Min, v.Max + 1);
+                            Char c = (Char)r.Next((int)v.Min, (int)(v.Max + 1));
                             if (!IsExcluded(c))
                                 l.Add(c);
                             else
@@ -350,42 +352,70 @@ namespace WinGenRouterKey
                 {
                     try
                     {
-                        int min = (int)key.GetValue("iMin1", DEF_MINCHAR1);
-                        int max = (int)key.GetValue("iMax1", DEF_MAXCHAR1);
-                        CheckState checkState = IntToCheckState((int)key.GetValue("checkState1", CheckStateToInt(DEF_CHECKSTATE1)));
+                        int min = (int)key.GetValue("iMin0001", DEF_MINCHAR1);
+                        int max = (int)key.GetValue("iMax0001", DEF_MAXCHAR1);
+                        CheckState checkState = IntToCheckState((int)key.GetValue("checkState0001", CheckStateToInt(DEF_CHECKSTATE1)));
                         t[0] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR1, DEF_MAXCHAR1, DEF_CHECKSTATE1, checkBox1, labelMin1, labelMax1, textBoxMin1, textBoxMax1);
                         t[0].DisplayVals();
 
-                        min = (int)key.GetValue("iMin2", DEF_MINCHAR2);
-                        max = (int)key.GetValue("iMax2", DEF_MAXCHAR2);
-                        checkState = IntToCheckState((int)key.GetValue("checkState2", CheckStateToInt(DEF_CHECKSTATE2)));
+                        min = (int)key.GetValue("iMin0002", DEF_MINCHAR2);
+                        max = (int)key.GetValue("iMax0002", DEF_MAXCHAR2);
+                        checkState = IntToCheckState((int)key.GetValue("checkState0002", CheckStateToInt(DEF_CHECKSTATE2)));
                         t[1] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR2, DEF_MAXCHAR2, DEF_CHECKSTATE2, checkBox2, labelMin2, labelMax2, textBoxMin2, textBoxMax2);
                         t[1].DisplayVals();
 
-                        min = (int)key.GetValue("iMin3", DEF_MINCHAR3);
-                        max = (int)key.GetValue("iMax3", DEF_MAXCHAR3);
-                        checkState = IntToCheckState((int)key.GetValue("checkState3", CheckStateToInt(DEF_CHECKSTATE3)));
+                        min = (int)key.GetValue("iMin0003", DEF_MINCHAR3);
+                        max = (int)key.GetValue("iMax0003", DEF_MAXCHAR3);
+                        checkState = IntToCheckState((int)key.GetValue("checkState0003", CheckStateToInt(DEF_CHECKSTATE3)));
                         t[2] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR3, DEF_MAXCHAR3, DEF_CHECKSTATE3, checkBox3, labelMin3, labelMax3, textBoxMin3, textBoxMax3);
                         t[2].DisplayVals();
 
-                        min = (int)key.GetValue("iMin4", DEF_MINCHAR4);
-                        max = (int)key.GetValue("iMax4", DEF_MAXCHAR4);
-                        checkState = IntToCheckState((int)key.GetValue("checkState4", CheckStateToInt(DEF_CHECKSTATE4)));
+                        min = (int)key.GetValue("iMin0004", DEF_MINCHAR4);
+                        max = (int)key.GetValue("iMax0004", DEF_MAXCHAR4);
+                        checkState = IntToCheckState((int)key.GetValue("checkState0004", CheckStateToInt(DEF_CHECKSTATE4)));
                         t[3] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR4, DEF_MAXCHAR4, DEF_CHECKSTATE4, checkBox4, labelMin4, labelMax4, textBoxMin4, textBoxMax4);
                         t[3].DisplayVals();
 
-                        min = (int)key.GetValue("iMin5", DEF_MINCHAR5);
-                        max = (int)key.GetValue("iMax5", DEF_MAXCHAR5);
-                        checkState = IntToCheckState((int)key.GetValue("checkState5", CheckStateToInt(DEF_CHECKSTATE5)));
+                        min = (int)key.GetValue("iMin0005", DEF_MINCHAR5);
+                        max = (int)key.GetValue("iMax0005", DEF_MAXCHAR5);
+                        checkState = IntToCheckState((int)key.GetValue("checkState0005", CheckStateToInt(DEF_CHECKSTATE5)));
                         t[4] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR5, DEF_MAXCHAR5, DEF_CHECKSTATE5, checkBox5, labelMin5, labelMax5, textBoxMin5, textBoxMax5);
                         t[4].DisplayVals();
 
-                        pwLength = (int)key.GetValue("iLength", DEF_LENGTH);
+                        pwLength = (int)key.GetValue("iLength000", DEF_LENGTH);
                         textBoxLength.Text = pwLength.ToString();
                     }
                     catch { }
                 }
             }
+        }
+        //---------------------------------------------------------------------------
+        private bool RegistryWrite()
+        {
+            RegistryKey key;
+
+            using (key = Registry.CurrentUser.OpenSubKey(REGISTRY_KEY, true))
+            {
+                if ((key = Registry.CurrentUser.CreateSubKey(REGISTRY_KEY)) == null)
+                    return false;
+
+                try
+                {
+                    for (int ii = 0; ii < DEF_FIELD_COUNT; ii++)
+                    {
+                        key.SetValue("iMin000" + (ii + 1).ToString(), t[ii].Min);
+                        key.SetValue("iMax000" + (ii + 1).ToString(), t[ii].Max);
+                        key.SetValue("checkState000" + (ii + 1).ToString(), CheckStateToInt(t[ii].checkState));
+                    }
+
+                    key.SetValue("iLength000", pwLength);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         //---------------------------------------------------------------------------
         private CheckState IntToCheckState(int i)
@@ -404,34 +434,6 @@ namespace WinGenRouterKey
             if (cs == CheckState.Indeterminate)
                 return 2;
             return 0; // unchecked
-        }
-        //---------------------------------------------------------------------------
-        private bool RegistryWrite()
-        {
-            RegistryKey key;
-
-            using (key = Registry.CurrentUser.OpenSubKey(REGISTRY_KEY, true))
-            {
-                if ((key = Registry.CurrentUser.CreateSubKey(REGISTRY_KEY)) == null)
-                    return false;
-
-                try
-                {
-                    for (int ii = 0; ii < DEF_FIELD_COUNT; ii++)
-                    {
-                        key.SetValue("iMin" + (ii + 1).ToString(), t[ii].Min);
-                        key.SetValue("iMax" + (ii + 1).ToString(), t[ii].Max);
-                        key.SetValue("checkState" + (ii + 1).ToString(), CheckStateToInt(t[ii].checkState));
-                    }
-
-                    key.SetValue("iLength", pwLength);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-            return true;
         }
         //---------------------------------------------------------------------------
         private void ResetBoxes()

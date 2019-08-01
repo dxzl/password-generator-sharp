@@ -542,7 +542,7 @@
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(718, 414);
             this.Name = "FormMain";
-            this.Text = "Password Generator Sharp 2.0";
+            this.Text = "Password Generator Sharp 2.1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyDown);
