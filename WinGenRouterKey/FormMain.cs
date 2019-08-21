@@ -220,7 +220,6 @@ namespace WinGenRouterKey
 
             textBoxKey.Text = sKey;
         }
-
         //---------------------------------------------------------------------------
         private bool IsExcluded(Char c)
         {
@@ -241,7 +240,6 @@ namespace WinGenRouterKey
 
             return false;
         }
-
         //---------------------------------------------------------------------------
         private void buttonCopyToClipboard_Click(object sender, EventArgs e)
         {
@@ -290,7 +288,7 @@ namespace WinGenRouterKey
             }
         }
         //---------------------------------------------------------------------------
-        private void TextBox_MaxTextChanged(object sender, EventArgs e)
+       private void TextBox_MaxTextChanged(object sender, EventArgs e)
         {
             if (sender is TextBox)
             {
@@ -332,11 +330,11 @@ namespace WinGenRouterKey
         {
             ResetBoxes();
         }
-
         //---------------------------------------------------------------------------
         private void FormMain_Load(object sender, EventArgs e)
         {
-            RegistryRead(); // read in the registry values
+            // read in the registry values and load defaults if exception thrown (non-existent key)
+            RegistryRead();
 
             labelPh.Text = "(For Netgear AC750, user pass max length is 32 chars, wifi pass max length is 64, min char is 33, max char is 126.\n" +
                 "We suggest 32 chars max wifi password length as some wifi cameras have 32 max unicode characters.)";
@@ -344,49 +342,66 @@ namespace WinGenRouterKey
             labelMax.Text = "Max (1-" + DEF_MAXCHARLENGTH.ToString() + ")";
         }
         //---------------------------------------------------------------------------
-        void RegistryRead()
+        bool RegistryRead()
         {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(REGISTRY_KEY, false))
+            bool bRet = false;
+
+            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(REGISTRY_KEY))
             {
                 if (key != null)
                 {
                     try
                     {
-                        int min = (int)key.GetValue("iMin0001", DEF_MINCHAR1);
-                        int max = (int)key.GetValue("iMax0001", DEF_MAXCHAR1);
-                        CheckState checkState = IntToCheckState((int)key.GetValue("checkState0001", CheckStateToInt(DEF_CHECKSTATE1)));
+                        int min = RegGetInt(key, "iMin0001", DEF_MINCHAR1);
+                        int max = RegGetInt(key, "iMax0001", DEF_MAXCHAR1);
+                        CheckState checkState = IntToCheckState(RegGetInt(key, "checkState0001", CheckStateToInt(DEF_CHECKSTATE1)));
                         t[0] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR1, DEF_MAXCHAR1, DEF_CHECKSTATE1, checkBox1, labelMin1, labelMax1, textBoxMin1, textBoxMax1);
                         t[0].DisplayVals();
 
-                        min = (int)key.GetValue("iMin0002", DEF_MINCHAR2);
-                        max = (int)key.GetValue("iMax0002", DEF_MAXCHAR2);
-                        checkState = IntToCheckState((int)key.GetValue("checkState0002", CheckStateToInt(DEF_CHECKSTATE2)));
+                        min = RegGetInt(key, "iMin0002", DEF_MINCHAR2);
+                        max = RegGetInt(key, "iMax0002", DEF_MAXCHAR2);
+                        checkState = IntToCheckState(RegGetInt(key, "checkState0002", CheckStateToInt(DEF_CHECKSTATE2)));
                         t[1] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR2, DEF_MAXCHAR2, DEF_CHECKSTATE2, checkBox2, labelMin2, labelMax2, textBoxMin2, textBoxMax2);
                         t[1].DisplayVals();
 
-                        min = (int)key.GetValue("iMin0003", DEF_MINCHAR3);
-                        max = (int)key.GetValue("iMax0003", DEF_MAXCHAR3);
-                        checkState = IntToCheckState((int)key.GetValue("checkState0003", CheckStateToInt(DEF_CHECKSTATE3)));
+                        min = RegGetInt(key, "iMin0003", DEF_MINCHAR3);
+                        max = RegGetInt(key, "iMax0003", DEF_MAXCHAR3);
+                        checkState = IntToCheckState(RegGetInt(key, "checkState0003", CheckStateToInt(DEF_CHECKSTATE3)));
                         t[2] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR3, DEF_MAXCHAR3, DEF_CHECKSTATE3, checkBox3, labelMin3, labelMax3, textBoxMin3, textBoxMax3);
                         t[2].DisplayVals();
 
-                        min = (int)key.GetValue("iMin0004", DEF_MINCHAR4);
-                        max = (int)key.GetValue("iMax0004", DEF_MAXCHAR4);
-                        checkState = IntToCheckState((int)key.GetValue("checkState0004", CheckStateToInt(DEF_CHECKSTATE4)));
+                        min = RegGetInt(key, "iMin0004", DEF_MINCHAR4);
+                        max = RegGetInt(key, "iMax0004", DEF_MAXCHAR4);
+                        checkState = IntToCheckState(RegGetInt(key, "checkState0004", CheckStateToInt(DEF_CHECKSTATE4)));
                         t[3] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR4, DEF_MAXCHAR4, DEF_CHECKSTATE4, checkBox4, labelMin4, labelMax4, textBoxMin4, textBoxMax4);
                         t[3].DisplayVals();
 
-                        min = (int)key.GetValue("iMin0005", DEF_MINCHAR5);
-                        max = (int)key.GetValue("iMax0005", DEF_MAXCHAR5);
-                        checkState = IntToCheckState((int)key.GetValue("checkState0005", CheckStateToInt(DEF_CHECKSTATE5)));
+                        min = RegGetInt(key, "iMin0005", DEF_MINCHAR5);
+                        max = RegGetInt(key, "iMax0005", DEF_MAXCHAR5);
+                        checkState = IntToCheckState(RegGetInt(key, "checkState0005", CheckStateToInt(DEF_CHECKSTATE5)));
                         t[4] = new CheckBoxVars(min, max, checkState, DEF_MINCHAR5, DEF_MAXCHAR5, DEF_CHECKSTATE5, checkBox5, labelMin5, labelMax5, textBoxMin5, textBoxMax5);
                         t[4].DisplayVals();
 
-                        pwLength = (int)key.GetValue("iLength000", DEF_LENGTH);
+                        pwLength = RegGetInt(key, "iLength000", DEF_LENGTH);
                         textBoxLength.Text = pwLength.ToString();
+
+                        bRet = true;
                     }
                     catch { }
                 }
+            }
+            return bRet;
+        }
+        //---------------------------------------------------------------------------
+        private int RegGetInt(RegistryKey key, string sKey, int iDef)
+        {
+            try
+            {
+                return (int)key.GetValue(sKey);
+            }
+            catch
+            {
+                return iDef;
             }
         }
         //---------------------------------------------------------------------------
