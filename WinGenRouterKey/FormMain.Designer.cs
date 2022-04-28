@@ -72,6 +72,7 @@
             this.labelMin1 = new System.Windows.Forms.Label();
             this.textBoxMin1 = new System.Windows.Forms.TextBox();
             this.textBoxMax1 = new System.Windows.Forms.TextBox();
+            this.cbUseOnlyOnce = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -83,7 +84,7 @@
             // 
             // buttonGen
             // 
-            this.buttonGen.Location = new System.Drawing.Point(12, 116);
+            this.buttonGen.Location = new System.Drawing.Point(12, 164);
             this.buttonGen.Name = "buttonGen";
             this.buttonGen.Size = new System.Drawing.Size(206, 23);
             this.buttonGen.TabIndex = 0;
@@ -102,7 +103,7 @@
             // buttonClose
             // 
             this.buttonClose.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonClose.Location = new System.Drawing.Point(12, 194);
+            this.buttonClose.Location = new System.Drawing.Point(12, 267);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(206, 23);
             this.buttonClose.TabIndex = 2;
@@ -112,7 +113,7 @@
             // 
             // textBoxLength
             // 
-            this.textBoxLength.Location = new System.Drawing.Point(69, 77);
+            this.textBoxLength.Location = new System.Drawing.Point(71, 77);
             this.textBoxLength.Name = "textBoxLength";
             this.textBoxLength.Size = new System.Drawing.Size(73, 20);
             this.textBoxLength.TabIndex = 5;
@@ -138,7 +139,7 @@
             // labelLength
             // 
             this.labelLength.AutoSize = true;
-            this.labelLength.Location = new System.Drawing.Point(66, 61);
+            this.labelLength.Location = new System.Drawing.Point(68, 61);
             this.labelLength.Name = "labelLength";
             this.labelLength.Size = new System.Drawing.Size(82, 13);
             this.labelLength.TabIndex = 8;
@@ -157,7 +158,7 @@
             // buttonCopyToClipboard
             // 
             this.buttonCopyToClipboard.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonCopyToClipboard.Location = new System.Drawing.Point(12, 145);
+            this.buttonCopyToClipboard.Location = new System.Drawing.Point(12, 208);
             this.buttonCopyToClipboard.Name = "buttonCopyToClipboard";
             this.buttonCopyToClipboard.Size = new System.Drawing.Size(206, 23);
             this.buttonCopyToClipboard.TabIndex = 10;
@@ -520,11 +521,22 @@
             this.textBoxMax1.Text = "57";
             this.textBoxMax1.TextChanged += new System.EventHandler(this.TextBox_MaxTextChanged);
             // 
+            // cbUseOnlyOnce
+            // 
+            this.cbUseOnlyOnce.AutoSize = true;
+            this.cbUseOnlyOnce.Location = new System.Drawing.Point(28, 112);
+            this.cbUseOnlyOnce.Name = "cbUseOnlyOnce";
+            this.cbUseOnlyOnce.Size = new System.Drawing.Size(145, 17);
+            this.cbUseOnlyOnce.TabIndex = 13;
+            this.cbUseOnlyOnce.Text = "Use each char only once";
+            this.cbUseOnlyOnce.UseVisualStyleBackColor = true;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(702, 375);
+            this.Controls.Add(this.cbUseOnlyOnce);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.buttonCopyToClipboard);
             this.Controls.Add(this.labelPh);
@@ -542,7 +554,7 @@
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(718, 414);
             this.Name = "FormMain";
-            this.Text = "Password Generator Sharp 2.2";
+            this.Text = "Password Generator Sharp 3.0";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyDown);
@@ -611,6 +623,7 @@
         private System.Windows.Forms.TextBox textBoxMin1;
         private System.Windows.Forms.TextBox textBoxMax1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.CheckBox cbUseOnlyOnce;
     }
 }
 

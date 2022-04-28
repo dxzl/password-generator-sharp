@@ -43,7 +43,7 @@ namespace WinGenRouterKey
 
         const int DEF_LENGTH = 32; // Netgear user pass max is 32, wifi pass is 64 but wifi camera max is 32 unicode chars...
         const int DEF_MAXLENGTH = 2048;
-        const int DEF_MAXCHARLENGTH = int.MaxValue;
+        const int DEF_MAXCHARLENGTH = 65535;
 
         const int DEF_RETRIES = 10; // try again 10 * pwLength
 
@@ -63,17 +63,12 @@ namespace WinGenRouterKey
         private void buttonGen_Click(object sender, EventArgs e)
         {
             // strategy:
-            // 1) get the range from each field if it's "on" and "include"
-            //
-            // 2) assign each include field a weight based on the % of the overall range of all fields
-            //
-            // 3) get the # of chars in the total length of the password that should be assigned to each field
-            //    based on the % of the total range the particular field represents
-            //
-            // 4) make a List the length of the password to be generated and select x chars from field 1,
-            //    y chars from field 2, Etc. and add the # of chars for that field to the list.
-            //
-            // 5) now randomly select indices from the list to populate the password box - Voila!
+            // 1) check the min and max ranges for each field.
+            // 2) add each field to a HashSet and then UnionWith if checkbox for field is checked
+            //    or ExceptWith if checkbox is greyed.
+            // 3) convert global HashSet to a List then randomly select and add entries to the output key,
+            //    deleting entries from the list if user checks "use each char only once".
+            // 4) If the password is short of the key and UseOnlyOnce is checked, print message and truncate Max Keylength
 
             try { pwLength = Convert.ToInt32(textBoxLength.Text); }
             catch { pwLength = -1; }
@@ -86,159 +81,75 @@ namespace WinGenRouterKey
             }
 
             string sKey = "";
-            int iTotalRange = 0;
-            int iBiggestRange = 0;
-            CheckBoxVars cbv = null;
+            var ghashSet = new HashSet<UInt16>();
 
             // Check limits of enabled fields
             for (int ii = 0; ii < DEF_FIELD_COUNT; ii++)
             {
-                string sCheckBox = "checkBox" + (ii + 1).ToString();
-                CheckBox checkBox = (CheckBox)panel1.Controls.Find(sCheckBox, true)[0];
+                //string sCheckBox = "checkBox" + (ii + 1).ToString();
+                //CheckBox checkBox = panel1.Controls.Find(sCheckBox, true)[0] as CheckBox;
 
-                if (checkBox.CheckState == CheckState.Unchecked)
+                CheckBoxVars v = t[ii];
+
+                if (v.checkState != CheckState.Checked)
                     continue;
 
-                var v = (CheckBoxVars)checkBox.Tag;
+                int min = v.Min;
+                int max = v.Max;
 
-                int iMin, iMax;
-
-                try { iMin = Convert.ToInt32(v.minBox.Text); }
-                catch { iMin = -1; }
-
-                if (iMin < 1 || iMin > DEF_MAXCHARLENGTH)
+                if (min < 1 || max > DEF_MAXCHARLENGTH)
                 {
-                    MessageBox.Show("Min character at (" + iMin.ToString() + ") at " + (ii + 1).ToString() + " is not allowed!");
+                    MessageBox.Show("Min character (" + min.ToString() + ") at " + (ii + 1).ToString() + " is not allowed!");
                     return;
                 }
 
-                try { iMax = Convert.ToInt32(v.maxBox.Text); }
-                catch { iMax = -1; }
-
-                if (iMax < 1 || iMax > DEF_MAXCHARLENGTH)
+                if (max < 1 || max > DEF_MAXCHARLENGTH)
                 {
-                    MessageBox.Show("Max character (" + iMax.ToString() + ") at " + (ii + 1).ToString() + " is not allowed!");
+                    MessageBox.Show("Max character (" + max.ToString() + ") at " + (ii + 1).ToString() + " is not allowed!");
                     return;
                 }
 
-                if (iMin > iMax)
+                if (min > max)
                 {
-                    MessageBox.Show("Min (" + iMin.ToString() + ") is > Max (" + iMax.ToString() + ") at " + (ii + 1).ToString() + "!");
+                    MessageBox.Show("Min (" + v.Min.ToString() + ") is > Max (" + max.ToString() + ") at " + (ii + 1).ToString() + "!");
                     return;
                 }
 
-                // set and display
-                v.Min = iMin;
-                v.Max = iMax;
-
-                v.range = v.Max - v.Min;
-                iTotalRange += v.range;
-
-                // save reference to our vars with the most range
-                if (v.range > iBiggestRange)
-                {
-                    iBiggestRange = v.range;
-                    cbv = v; // have our vars handy for use (below)!
-                }
+                var lhashSet = new HashSet<UInt16>();
+                for (int jj = min; jj <= max; jj++)
+                    lhashSet.Add((UInt16)jj);
+                ghashSet.UnionWith(lhashSet);
             }
 
-            var l = new List<Char>();
-            var r = new Random();
-            int iRetries = 0;
-
-            // get the range deltas for included fields
             for (int ii = 0; ii < DEF_FIELD_COUNT; ii++)
             {
-                string sCheckBox = "checkBox" + (ii + 1).ToString();
-                CheckBox checkBox = (CheckBox)panel1.Controls.Find(sCheckBox, true)[0];
-
-                if (checkBox.CheckState != CheckState.Checked)
-                    continue;
-
-                var v = (CheckBoxVars)checkBox.Tag;
-
-                v.fraction = v.range/(double)iTotalRange;
-                v.numChars = (int)Math.Round(v.fraction * pwLength);
-
-                for (int jj = 0; jj < v.numChars; jj++)
+                CheckBoxVars v = t[ii];
+                if (v.checkState == CheckState.Indeterminate)
                 {
-                    if (l.Count < pwLength)
-                    {
-                        if (v.Min <= v.Max + 1)
-                        {
-                            Char c = (Char)r.Next((int)v.Min, (int)(v.Max + 1));
-                            if (!IsExcluded(c))
-                                l.Add(c);
-                            else
-                            {
-                                if (++iRetries > pwLength * DEF_RETRIES)
-                                {
-                                    MessageBox.Show("Unable to generate key with current settings (1).");
-                                    return;
-                                }
-
-                                jj--; // continue on and retry for a non-excluded char
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("Error: Min is < Max at: " + (ii+1).ToString());
-                            break;
-                        }
-                    }
+                    var lhashSet = new HashSet<UInt16>();
+                    int max = v.Max;
+                    for (int jj = v.Min; jj <= max; jj++)
+                        lhashSet.Add((UInt16)jj);
+                    ghashSet.ExceptWith(lhashSet);
                 }
             }
 
-            iRetries = 0;
+            List<UInt16> pwList = ghashSet.ToList();
+            var r = new Random();
+            bool bRemove = cbUseOnlyOnce.CheckState == CheckState.Checked;
 
-            // this is sort of a fudge for padding out the password, if needed.
-            // cbv is set above...
-            if (cbv != null)
+            for (int ii = 0; ii < pwLength && pwList.Count > 0; ii++)
             {
-                while (l.Count < pwLength)
-                {
-                    Char c = (Char)r.Next(cbv.Min, cbv.Max+1);
-                    if (!IsExcluded(c))
-                        l.Add(c);
-                    else
-                    {
-                        if (++iRetries > pwLength * DEF_RETRIES)
-                        {
-                            MessageBox.Show("Unable to generate key with current settings (2).");
-                            return;
-                        }
-                    }
-                }
+                int idx = r.Next(pwList.Count);
+                sKey += (Char)pwList[idx];
+                if (bRemove)
+                    pwList.RemoveAt(idx);
             }
 
-            while (l.Count > 0)
-            {
-                int idx = r.Next(l.Count);
-                sKey += l[idx];
-                l.RemoveAt(idx);
-            }
+            if (sKey.Length < pwLength)
+                textBoxLength.Text = sKey.Length.ToString();
 
             textBoxKey.Text = sKey;
-        }
-        //---------------------------------------------------------------------------
-        private bool IsExcluded(Char c)
-        {
-            // Check limits of enabled fields
-            for (int ii = 0; ii < DEF_FIELD_COUNT; ii++)
-            {
-                string sCheckBox = "checkBox" + (ii + 1).ToString();
-                CheckBox checkBox = (CheckBox)panel1.Controls.Find(sCheckBox, true)[0];
-
-                if (checkBox.CheckState != CheckState.Indeterminate)
-                    continue;
-
-                var v = (CheckBoxVars)checkBox.Tag;
-
-                if (c >= v.Min && c <= v.Max)
-                    return true;
-            }
-
-            return false;
         }
         //---------------------------------------------------------------------------
         private void buttonCopyToClipboard_Click(object sender, EventArgs e)
@@ -254,9 +165,9 @@ namespace WinGenRouterKey
         {
             if (sender is CheckBox)
             {
-                var c = (CheckBox)sender;
-                var v = (CheckBoxVars)c.Tag;
-                if (v == null) return;
+                var c = sender as CheckBox;
+                if (c == null || c.Tag == null) return;
+                var v = c.Tag as CheckBoxVars;
                 v.checkState = v.checkBox.CheckState;
             }
         }
@@ -265,9 +176,9 @@ namespace WinGenRouterKey
         {
             if (sender is TextBox)
             {
-                var t = (TextBox)sender;
-                var v = (CheckBoxVars)t.Tag;
-                if (v == null) return;
+                var t = sender as TextBox;
+                if (t == null || t.Tag == null) return;
+                var v = t.Tag as CheckBoxVars;
 
                 long iC = -1;
 
@@ -288,13 +199,13 @@ namespace WinGenRouterKey
             }
         }
         //---------------------------------------------------------------------------
-       private void TextBox_MaxTextChanged(object sender, EventArgs e)
+        private void TextBox_MaxTextChanged(object sender, EventArgs e)
         {
             if (sender is TextBox)
             {
-                var t = (TextBox)sender;
-                var v = (CheckBoxVars)t.Tag;
-                if (v == null) return;
+                var t = sender as TextBox;
+                if (t == null || t.Tag == null) return;
+                var v = t.Tag as CheckBoxVars;
 
                 long iC = -1;
 
@@ -336,8 +247,8 @@ namespace WinGenRouterKey
             // read in the registry values and load defaults if exception thrown (non-existent key)
             RegistryRead();
 
-            labelPh.Text = "(For Netgear AC750, user pass max length is 32 chars, wifi pass max length is 64, min char is 33, max char is 126.\n" +
-                "We suggest 32 chars max wifi password length as some wifi cameras have 32 max unicode characters.)";
+            labelPh.Text = "A randomly generated password is taken from the union of checkmarked fields minus the characters from range-fields \n" +
+                "with a black square. The black square in a checkbox means \"exclude this range of characters from the password.\"";
             labelMin.Text = "Min (1-" + DEF_MAXCHARLENGTH.ToString() + ")";
             labelMax.Text = "Max (1-" + DEF_MAXCHARLENGTH.ToString() + ")";
         }
@@ -577,7 +488,7 @@ namespace WinGenRouterKey
         //---------------------------------------------------------------------------
         private void EndHexMode()
         {
-            if(hexBox != null)
+            if (hexBox != null)
             {
                 var v = hexBox.Tag as CheckBoxVars;
 

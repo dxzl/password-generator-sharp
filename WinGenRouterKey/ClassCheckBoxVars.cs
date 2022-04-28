@@ -7,6 +7,8 @@ using System.Windows.Forms;
 
 namespace WinGenRouterKey
 {
+    // Instantiated object references to this class are stored in the Tag attribute of the checkboxes
+    // on panel1 of the FormMain design view.
     public class CheckBoxVars
     {
         public int defMin, defMax, range, numChars;
@@ -93,10 +95,10 @@ namespace WinGenRouterKey
 
             this.min = min;
             string sFmt = (min <= short.MaxValue) ? "X4" : "X8";
-            this.MinHint = min.ToString(sFmt);
+            MinHint = min.ToString(sFmt);
             this.max = max;
             sFmt = (max <= short.MaxValue) ? "X4" : "X8";
-            this.MaxHint = max.ToString(sFmt);
+            MaxHint = max.ToString(sFmt);
             this.defMin = defMin;
             this.defMax = defMax;
             this.checkState = checkState;
