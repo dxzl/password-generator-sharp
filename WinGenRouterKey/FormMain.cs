@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32; // used for registry access...
+//using System.ComponentModel;
+//using System.Data;
+//using System.Drawing;
+//using System.IO;
+//using System.Runtime.Serialization.Formatters.Binary;
+//using System.Text;
 
 /// <summary>
 ///  https://www.fileformat.info/info/charset/UTF-16/list.htm
@@ -41,7 +41,7 @@ namespace WinGenRouterKey
         public const int DEF_MAXCHAR5 = 122;
         public const CheckState DEF_CHECKSTATE5 = CheckState.Checked;
 
-        const int DEF_LENGTH = 32; // Netgear user pass max is 32, wifi pass is 64 but wifi camera max is 32 unicode chars...
+        const int DEF_LENGTH = 32;
         const int DEF_MAXLENGTH = 2048;
         const int DEF_MAXCHARLENGTH = 65535;
 
@@ -242,6 +242,11 @@ namespace WinGenRouterKey
             ResetBoxes();
         }
         //---------------------------------------------------------------------------
+        private void base64ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PresetBase64();
+        }
+        //---------------------------------------------------------------------------
         private void FormMain_Load(object sender, EventArgs e)
         {
             // read in the registry values and load defaults if exception thrown (non-existent key)
@@ -364,10 +369,37 @@ namespace WinGenRouterKey
         //---------------------------------------------------------------------------
         private void ResetBoxes()
         {
+            cbUseOnlyOnce.Checked = false;
+
             for (int ii = 0; ii < DEF_FIELD_COUNT; ii++)
                 t[ii].Restore();
 
             pwLength = DEF_LENGTH;
+
+            DisplayBoxes();
+        }
+        //---------------------------------------------------------------------------
+        private void PresetBase64()
+        {
+            cbUseOnlyOnce.Checked = true;
+
+            t[0].Min = '_';
+            t[0].Max = '_';
+            t[0].checkState = CheckState.Checked;
+            t[1].Min = '0';
+            t[1].Max = '9';
+            t[1].checkState = CheckState.Checked;
+            t[2].Min = '-';
+            t[2].Max = '-';
+            t[2].checkState = CheckState.Checked;
+            t[3].Min = 'A';
+            t[3].Max = 'Z';
+            t[3].checkState = CheckState.Checked;
+            t[4].Min = 'a';
+            t[4].Max = 'z';
+            t[4].checkState = CheckState.Checked;
+
+            pwLength = 64;
 
             DisplayBoxes();
         }
