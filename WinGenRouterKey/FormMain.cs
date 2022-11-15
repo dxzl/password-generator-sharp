@@ -146,8 +146,10 @@ namespace WinGenRouterKey
                     pwList.RemoveAt(idx);
             }
 
-            if (sKey.Length < pwLength)
+            if (sKey.Length < pwLength){
                 textBoxLength.Text = sKey.Length.ToString();
+                MessageBox.Show("Warning: Text length shortened from " + pwLength + " to " + sKey.Length + " characters!");
+            }
 
             textBoxKey.Text = sKey;
         }

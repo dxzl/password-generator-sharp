@@ -40,6 +40,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.presetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.azAZ09ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.base64ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -73,7 +74,6 @@
             this.textBoxMin1 = new System.Windows.Forms.TextBox();
             this.textBoxMax1 = new System.Windows.Forms.TextBox();
             this.cbUseOnlyOnce = new System.Windows.Forms.CheckBox();
-            this.base64ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -190,10 +190,18 @@
             // azAZ09ToolStripMenuItem
             // 
             this.azAZ09ToolStripMenuItem.Name = "azAZ09ToolStripMenuItem";
-            this.azAZ09ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.azAZ09ToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.azAZ09ToolStripMenuItem.Text = "a-z A-Z 0-9";
             this.azAZ09ToolStripMenuItem.ToolTipText = "Genetates a 63-character password for most routers";
             this.azAZ09ToolStripMenuItem.Click += new System.EventHandler(this.AzAZ09ToolStripMenuItem_Click);
+            // 
+            // base64ToolStripMenuItem
+            // 
+            this.base64ToolStripMenuItem.Name = "base64ToolStripMenuItem";
+            this.base64ToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.base64ToolStripMenuItem.Text = "Web-Safe Base 64";
+            this.base64ToolStripMenuItem.ToolTipText = "Generates a web-safe base-64 random table";
+            this.base64ToolStripMenuItem.Click += new System.EventHandler(this.base64ToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -534,14 +542,6 @@
             this.cbUseOnlyOnce.Text = "Use each char only once";
             this.cbUseOnlyOnce.UseVisualStyleBackColor = true;
             // 
-            // base64ToolStripMenuItem
-            // 
-            this.base64ToolStripMenuItem.Name = "base64ToolStripMenuItem";
-            this.base64ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.base64ToolStripMenuItem.Text = "Web-Safe Base 64";
-            this.base64ToolStripMenuItem.ToolTipText = "Generates a web-safe base-64 random table";
-            this.base64ToolStripMenuItem.Click += new System.EventHandler(this.base64ToolStripMenuItem_Click);
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -565,7 +565,7 @@
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(718, 414);
             this.Name = "FormMain";
-            this.Text = "Password Generator Sharp 3.1";
+            this.Text = "Password Generator Sharp 3.2";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyDown);
